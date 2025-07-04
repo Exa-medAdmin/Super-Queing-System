@@ -43,43 +43,23 @@
             background: linear-gradient(135deg, #e17055 0%, #d63031 100%);
         }
 
-        .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            gap: 30px;
-        }
-
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            text-align: center;
         }
 
         .main-title {
-            text-align: center;
             font-size: 3.5rem;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
             font-weight: bold;
-        }
-
-        .datetime-info {
-            text-align: center;
-            margin-bottom: 30px;
-            opacity: 0.9;
         }
 
         .datetime {
             font-size: 1.3rem;
             margin-bottom: 10px;
-        }
-
-        .status-info {
-            font-size: 1.1rem;
-            opacity: 0.8;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            opacity: 0.9;
         }
 
         .connection-status {
@@ -87,6 +67,8 @@
             border-radius: 15px;
             font-size: 0.9rem;
             font-weight: bold;
+            margin-bottom: 30px;
+            display: inline-block;
         }
 
         .connected {
@@ -108,6 +90,7 @@
             overflow: hidden;
             box-shadow: 0 25px 60px rgba(0,0,0,0.2);
             border: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 30px;
         }
 
         .table-header {
@@ -173,19 +156,10 @@
             opacity: 0.6;
         }
 
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            opacity: 0.7;
-            font-size: 1rem;
-        }
-
         .sound-control {
-            margin-top: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
         }
 
         .sound-toggle {
@@ -234,12 +208,6 @@
             100% { background: rgba(46, 204, 113, 0.9); transform: scale(1); }
         }
 
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
-
         /* Responsive Design */
         @media (max-width: 768px) {
             body {
@@ -254,15 +222,9 @@
                 font-size: 1.1rem;
             }
 
-            .status-info {
-                flex-direction: column;
-                gap: 0px;
-            }
-
             .table-header,
             .table-row {
                 padding: 15px 10px;
-                grid-template-columns: 1fr 1fr;
             }
 
             .table-header {
@@ -308,76 +270,52 @@
                 font-size: 1.8rem;
             }
         }
-
-        /* Status Colors */
-        .active .queue-number {
-            color: #2c3e50;
-        }
-
-        .inactive .queue-number {
-            color: #2c3e50;
-        }
-
-        .active .channel-name {
-            color: #2c3e50;
-        }
-
-        .inactive .channel-name {
-            color: #2c3e50;
-        }
     </style>
 </head>
 <body class="theme-default">
-    <div class="main-container">
-            <div class="content" id="descriptionContent">กำลังโหลด...</div>
-        </div>
+    <div class="container">
+        <!-- หัวข้อหลัก (จากข้อความอธิบาย) -->
+        <h1 class="main-title" id="mainTitle">🏥 ระบบคิว</h1>
+        
+        <!-- วันเวลาและสถานะ -->
+        <div class="datetime" id="datetime">กำลังโหลด...</div>
+        <div class="connection-status" id="connectionStatus">กำลังเชื่อมต่อ...</div>
 
-        <div class="queue-container">
-            <div class="header">
-                <h1>🏥 ระบบคิว</h1>
-                <div class="datetime" id="datetime">กำลังโหลด...</div>
-                <div class="status-info">
-                    <span>ช่องที่ให้บริการ: <span id="activeChannels">-</span> / <span id="totalChannels">6</span></span>
-                    <span class="connection-status" id="connectionStatus">กำลังเชื่อมต่อ...</span>
-                </div>
+        <!-- ตารางคิว (เดียว) -->
+        <div class="queue-table">
+            <div class="table-header">
+                <div>ช่องบริการ</div>
+                <div>คิวที่เรียก</div>
             </div>
-
-            <div class="queue-table">
-                <div class="table-header">
-                    <div>ช่องบริการ</div>
-                    <div>คิวที่เรียก</div>
-                </div>
-                <div id="queueTableBody">
-                    <!-- ข้อมูลคิวจะถูกสร้างที่นี่โดย JavaScript -->
-                </div>
-            </div>
-
-            <div class="footer">
-                <div class="sound-control">
-                    <div class="sound-toggle" id="soundToggle" onclick="toggleSound()">
-                        <span class="sound-icon" id="soundIcon">🔊</span>
-                        <span id="soundText">เสียงเปิดอยู่</span>
-                    </div>
-                </div>
+            <div id="queueTableBody">
+                <!-- ข้อมูลคิวจะถูกสร้างที่นี่ -->
             </div>
         </div>
+
+        <!-- ปุ่มเสียง -->
+        <div class="sound-control">
+            <div class="sound-toggle" id="soundToggle" onclick="toggleSound()">
+                <span class="sound-icon" id="soundIcon">🔊</span>
+                <span id="soundText">เสียงเปิดอยู่</span>
+            </div>
+        </div>
+    </div>
 
     <script>
-        let previousQueueData = {}; // เก็บข้อมูลคิวครั้งก่อน
+        let previousQueueData = {};
         let audioContext = null;
-        let isFirstLoad = true; // ป้องกันเสียงเมื่อโหลดครั้งแรก
+        let isFirstLoad = true;
         let eventSource = null;
         let reconnectAttempts = 0;
         let maxReconnectAttempts = 5;
-        let soundEnabled = true; // เสียงเปิดเป็นค่า default
-        let currentSettings = null; // เก็บการตั้งค่าปัจจุบัน
+        let soundEnabled = true;
+        let currentSettings = null;
 
         // ฟังก์ชันเปิด/ปิดเสียง
         function toggleSound() {
             soundEnabled = !soundEnabled;
             updateSoundUI();
             
-            // เปิดใช้งาน audioContext เมื่อเปิดเสียง
             if (soundEnabled && !audioContext) {
                 enableAudio();
             }
@@ -404,9 +342,7 @@
 
         // อัปเดตธีมสี
         function updateTheme(theme) {
-            // ลบ class ธีมเก่าทั้งหมด
             document.body.classList.remove('theme-default', 'theme-blue', 'theme-green', 'theme-purple', 'theme-orange', 'theme-red');
-            // เพิ่ม class ธีมใหม่
             document.body.classList.add(`theme-${theme}`);
         }
 
@@ -421,7 +357,7 @@
             }
         }
 
-        // สร้างเสียงกระดิ่งแบบเรียบง่าย
+        // สร้างเสียงกระดิ่ง
         function createBellSound() {
             if (!audioContext) {
                 try {
@@ -433,25 +369,20 @@
             }
 
             try {
-                // สร้างเสียงกระดิ่ง (โทนเสียงสูง + โทนเสียงต่ำ)
                 const oscillator1 = audioContext.createOscillator();
                 const oscillator2 = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
 
-                // ตั้งค่าความถี่เสียง (กระดิ่ง)
-                oscillator1.frequency.setValueAtTime(800, audioContext.currentTime); // โทนสูง
-                oscillator2.frequency.setValueAtTime(600, audioContext.currentTime); // โทนต่ำ
+                oscillator1.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator2.frequency.setValueAtTime(600, audioContext.currentTime);
 
-                // ตั้งค่าระดับเสียง
                 gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
 
-                // เชื่อมต่อเสียง
                 oscillator1.connect(gainNode);
                 oscillator2.connect(gainNode);
                 gainNode.connect(audioContext.destination);
 
-                // เล่นเสียง
                 oscillator1.start(audioContext.currentTime);
                 oscillator2.start(audioContext.currentTime);
                 oscillator1.stop(audioContext.currentTime + 0.5);
@@ -463,16 +394,15 @@
             }
         }
 
-        // เล่นเสียงแจ้งเตือนซ้ำ 2 ครั้ง
+        // เล่นเสียงแจ้งเตือน
         function playQueueAlert() {
-            // ตรวจสอบว่าเสียงเปิดอยู่หรือไม่
             if (!soundEnabled) {
                 console.log('🔇 เสียงถูกปิดอยู่');
                 return;
             }
             
             createBellSound();
-            setTimeout(() => createBellSound(), 300); // เล่นซ้ำหลัง 0.3 วินาที
+            setTimeout(() => createBellSound(), 300);
         }
 
         // ตรวจสอบการเปลี่ยนแปลงคิว
@@ -485,18 +415,15 @@
             let hasNewQueue = false;
             let changedChannels = [];
 
-            // ตรวจสอบแต่ละช่องบริการ
             Object.keys(newQueueData.serviceChannels).forEach(channelName => {
                 const newData = newQueueData.serviceChannels[channelName];
                 const oldData = previousQueueData[channelName];
 
-                // ถ้ามีคิวใหม่ (คิวเปลี่ยนจากว่าง หรือ เปลี่ยนเป็นเลขใหม่)
                 if (newData && newData.currentQueue && newData.isActive) {
                     if (!oldData || 
                         !oldData.currentQueue || 
                         oldData.currentQueue !== newData.currentQueue) {
                         hasNewQueue = true;
-                        // แปลงชื่อช่องจาก "ช่องบริการ X" เป็น "ช่อง X" สำหรับการแสดงผล
                         const displayChannelName = channelName.replace('ช่องบริการ', 'ช่อง');
                         changedChannels.push(displayChannelName);
                         console.log(`🆕 คิวใหม่: ${displayChannelName} เรียกคิว ${newData.currentQueue}`);
@@ -508,7 +435,6 @@
                 playQueueAlert();
                 showNotification('🔔 มีการเรียกคิวใหม่!');
                 
-                // เพิ่มเอฟเฟกต์ไฮไลท์ให้ช่องที่มีคิวใหม่
                 changedChannels.forEach(channelName => {
                     highlightChannel(channelName);
                 });
@@ -517,7 +443,6 @@
 
         // ไฮไลท์ช่องบริการที่มีคิวใหม่
         function highlightChannel(channelName) {
-            // แปลงชื่อช่องจาก "ช่อง X" กลับเป็น index (X-1)
             const channelIndex = parseInt(channelName.replace('ช่อง ', '')) - 1;
             const rows = document.querySelectorAll('.table-row');
             if (rows[channelIndex]) {
@@ -528,7 +453,7 @@
             }
         }
 
-        // แสดงการแจ้งเตือนข้อความ
+        // แสดงการแจ้งเตือน
         function showNotification(message) {
             const notification = document.createElement('div');
             notification.style.cssText = `
@@ -572,7 +497,7 @@
             }, 3000);
         }
 
-        // เปิดใช้งานเสียงเมื่อผู้ใช้คลิกหน้าจอ
+        // เปิดใช้งานเสียง
         function enableAudio() {
             if (!audioContext) {
                 try {
@@ -584,9 +509,8 @@
             }
         }
 
-        // เปิดใช้งาน AudioContext อัตโนมัติเมื่อโหลดหน้า
+        // เริ่มต้นเสียง
         function initializeAudio() {
-            // ลองเปิดใช้งาน AudioContext ทันที (บางเบราว์เซอร์อนุญาต)
             try {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 console.log('🔊 เปิดใช้งาน AudioContext อัตโนมัติ');
@@ -608,7 +532,7 @@
             }
         }
 
-        // เชื่อมต่อ Server-Sent Events
+        // เชื่อมต่อ SSE
         function connectSSE() {
             if (eventSource) {
                 eventSource.close();
@@ -628,20 +552,14 @@
                 try {
                     const data = JSON.parse(event.data);
                     
-                    // ข้าม ping messages
                     if (data.type === 'ping') {
                         return;
                     }
 
                     console.log('📡 ได้รับข้อมูลอัปเดต:', data);
                     
-                    // ตรวจสอบการเปลี่ยนแปลงและเล่นเสียงแจ้งเตือน
                     checkQueueChanges(data);
-
-                    // เก็บข้อมูลปัจจุบันไว้เปรียบเทียบครั้งถัดไป
                     previousQueueData = JSON.parse(JSON.stringify(data.serviceChannels));
-
-                    // อัปเดต UI
                     updateQueueDisplay(data);
                 } catch (error) {
                     console.error('Error parsing SSE data:', error);
@@ -654,11 +572,10 @@
                 
                 eventSource.close();
                 
-                // ลองเชื่อมต่อใหม่
                 if (reconnectAttempts < maxReconnectAttempts) {
                     reconnectAttempts++;
                     console.log(`🔄 กำลังลองเชื่อมต่อใหม่... ครั้งที่ ${reconnectAttempts}`);
-                    setTimeout(connectSSE, 3000 * reconnectAttempts); // เพิ่มเวลารอทุกครั้ง
+                    setTimeout(connectSSE, 3000 * reconnectAttempts);
                 } else {
                     console.log('💥 ไม่สามารถเชื่อมต่อได้ กำลังใช้ fallback polling...');
                     useFallbackPolling();
@@ -666,7 +583,7 @@
             };
         }
 
-        // ใช้ polling เป็น fallback เมื่อ SSE ไม่ทำงาน
+        // Fallback polling
         function useFallbackPolling() {
             updateConnectionStatus(false);
             
@@ -680,7 +597,6 @@
                         previousQueueData = JSON.parse(JSON.stringify(data.serviceChannels));
                         updateQueueDisplay(data);
                         
-                        // ถ้า polling ทำงานได้ ลองเชื่อมต่อ SSE ใหม่
                         clearInterval(pollInterval);
                         reconnectAttempts = 0;
                         setTimeout(connectSSE, 1000);
@@ -688,20 +604,17 @@
                 } catch (error) {
                     console.error('Polling error:', error);
                 }
-            }, 5000); // polling ทุก 5 วินาที
+            }, 5000);
         }
 
-        // อัปเดต UI ด้วยข้อมูลใหม่
+        // อัปเดต UI
         function updateQueueDisplay(data) {
-            // อัปเดตการตั้งค่าถ้ามี
+            // อัปเดตการตั้งค่า
             if (data.settings) {
                 if (!currentSettings || JSON.stringify(currentSettings) !== JSON.stringify(data.settings)) {
                     currentSettings = data.settings;
                     
-                    // อัปเดตธีม
                     updateTheme(currentSettings.background_theme);
-                    
-                    // อัปเดตข้อความอธิบาย
                     updateDescription(currentSettings.description_text);
                 }
             }
@@ -710,7 +623,6 @@
             const tableBody = document.getElementById('queueTableBody');
             tableBody.innerHTML = '';
 
-            // สร้างแถวตามจำนวนช่องที่ตั้งค่า
             const channelCount = currentSettings ? currentSettings.channel_count : 6;
             for (let i = 1; i <= channelCount; i++) {
                 const channelName = `ช่อง ${i}`;
@@ -721,6 +633,7 @@
             }
         }
 
+        // อัปเดตวันเวลา
         function updateDateTime() {
             const now = new Date();
             const options = {
@@ -736,6 +649,7 @@
             document.getElementById('datetime').textContent = now.toLocaleDateString('th-TH', options);
         }
 
+        // สร้างแถวตาราง
         function createTableRow(channelName, channelData) {
             const row = document.createElement('div');
             const isActive = channelData && channelData.isActive && channelData.currentQueue;
@@ -755,736 +669,10 @@
         // เริ่มต้นระบบ
         function initialize() {
             updateDateTime();
-            initializeAudio(); // เริ่มต้นเสียงอัตโนมัติ
-            updateSoundUI(); // อัปเดต UI ปุ่มเสียง
-            connectSSE(); // เชื่อมต่อ SSE แทน polling
-
-            // อัปเดตเวลาทุกวินาที
-            setInterval(updateDateTime, 1000);
-        }
-
-        // Event listeners
-        document.addEventListener('click', enableAudio, { once: true });
-        document.addEventListener('touchstart', enableAudio, { once: true });
-        document.addEventListener('DOMContentLoaded', initialize);
-
-        // รีเชื่อมต่อเมื่อกลับมาที่หน้าเว็บ
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden && (!eventSource || eventSource.readyState === EventSource.CLOSED)) {
-                connectSSE();
-            }
-        });
-
-        // รีเชื่อมต่อเมื่อมีการเชื่อมต่อเน็ตใหม่
-        window.addEventListener('online', () => {
-            if (!eventSource || eventSource.readyState === EventSource.CLOSED) {
-                connectSSE();
-            }
-        });
-
-        // ปิดการเชื่อมต่อเมื่อปิดหน้าเว็บ
-        window.addEventListener('beforeunload', () => {
-            if (eventSource) {
-                eventSource.close();
-            }
-        });
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>หน้าจอแสดงคิว - ระบบรันคิว</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 30px;
-            color: white;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .header h1 {
-            font-size: 3.5rem;
-            margin-bottom: 15px;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
-        }
-
-        .datetime {
-            font-size: 1.3rem;
-            opacity: 0.9;
-            margin-bottom: 10px;
-        }
-
-        .status-info {
-            font-size: 1.1rem;
-            opacity: 0.8;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .connection-status {
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.9rem;
-            font-weight: bold;
-        }
-
-        .connected {
-            background: rgba(46, 204, 113, 0.2);
-            color: #2ecc71;
-            border: 1px solid #2ecc71;
-        }
-
-        .disconnected {
-            background: rgba(231, 76, 60, 0.2);
-            color: #e74c3c;
-            border: 1px solid #e74c3c;
-        }
-
-        .queue-table {
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .table-header {
-            background: rgba(255,255,255,0.2);
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            padding: 25px 20px;
-            font-weight: bold;
-            font-size: 1.6rem;
-            text-align: center;
-            border-bottom: 2px solid rgba(255,255,255,0.3);
-        }
-
-        .table-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            padding: 20px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.3s ease;
-            background: rgba(255,255,255,0.9);
-            color: #333;
-        }
-
-        .table-row:last-child {
-            border-bottom: none;
-        }
-
-        .table-row:hover {
-            background: rgba(255,255,255,0.95);
-        }
-
-        .table-row.active {
-            background: rgba(255,255,255,0.95);
-            color: #2c3e50;
-            border-left: 5px solid #27ae60;
-            animation: pulse-active 2s infinite;
-        }
-
-        .table-row.inactive {
-            background: rgba(149, 165, 166, 0.6);
-            color: #2c3e50;
-            opacity: 0.8;
-        }
-
-        .table-row.new-queue {
-            animation: highlight-new 1s ease-out;
-        }
-
-        .channel-name {
-            font-size: 1.8rem;
-            font-weight: bold;
-        }
-
-        .queue-number {
-            font-size: 4rem;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-        }
-
-        .queue-number.empty {
-            font-size: 2.5rem;
-            opacity: 0.6;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            opacity: 0.7;
-            font-size: 1rem;
-        }
-
-        .sound-control {
-            margin-top: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .sound-toggle {
-            background: rgba(255,255,255,0.2);
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50px;
-            padding: 10px 20px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 1rem;
-            user-select: none;
-        }
-
-        .sound-toggle:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
-        }
-
-        .sound-toggle.sound-off {
-            background: rgba(231, 76, 60, 0.2);
-            border-color: #e74c3c;
-            color: #e74c3c;
-        }
-
-        .sound-toggle.sound-off:hover {
-            background: rgba(231, 76, 60, 0.3);
-        }
-
-        .sound-icon {
-            font-size: 1.2rem;
-        }
-
-        /* Animations */
-        @keyframes pulse-active {
-            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
-            50% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0.1); }
-            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
-        }
-
-        @keyframes highlight-new {
-            0% { background: rgba(255, 215, 0, 0.9); transform: scale(1.02); }
-            100% { background: rgba(46, 204, 113, 0.9); transform: scale(1); }
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            body {
-                padding: 15px;
-            }
-
-            .header h1 {
-                font-size: 2.5rem;
-            }
-
-            .datetime {
-                font-size: 1.1rem;
-            }
-
-            .status-info {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .table-header,
-            .table-row {
-                padding: 15px 10px;
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .table-header {
-                font-size: 1.4rem;
-            }
-
-            .channel-name {
-                font-size: 1.5rem;
-            }
-
-            .queue-number {
-                font-size: 3rem;
-            }
-
-            .queue-number.empty {
-                font-size: 2rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .table-header,
-            .table-row {
-                padding: 12px 8px;
-            }
-
-            .table-header {
-                font-size: 1.2rem;
-            }
-
-            .channel-name {
-                font-size: 1.3rem;
-            }
-
-            .queue-number {
-                font-size: 2.5rem;
-            }
-
-            .queue-number.empty {
-                font-size: 1.8rem;
-            }
-        }
-
-        /* Status Colors */
-        .active .queue-number {
-            color: #2c3e50;
-        }
-
-        .inactive .queue-number {
-            color: #2c3e50;
-        }
-
-        .active .channel-name {
-            color: #2c3e50;
-        }
-
-        .inactive .channel-name {
-            color: #2c3e50;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🏥 คิวเข้ารับตรวจสุขภาพ ฟรี</h1>
-            <div class="datetime" id="datetime">กำลังโหลด...</div>
-            <div class="status-info">
-                <span>ช่องที่ให้บริการ: <span id="activeChannels">-</span> / 6</span>
-                <span class="connection-status" id="connectionStatus">กำลังเชื่อมต่อ...</span>
-            </div>
-        </div>
-
-        <div class="queue-table">
-            <div class="table-header">
-                <div>ช่องบริการ</div>
-                <div>คิวที่เรียก</div>
-            </div>
-            <div id="queueTableBody">
-                <!-- ข้อมูลคิวจะถูกสร้างที่นี่โดย JavaScript -->
-            </div>
-        </div>
-
-        <div class="footer">
-            <div class="sound-control">
-                <div class="sound-toggle" id="soundToggle" onclick="toggleSound()">
-                    <span class="sound-icon" id="soundIcon">🔊</span>
-                    <span id="soundText">เสียงเปิดอยู่</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let previousQueueData = {}; // เก็บข้อมูลคิวครั้งก่อน
-        let audioContext = null;
-        let isFirstLoad = true; // ป้องกันเสียงเมื่อโหลดครั้งแรก
-        let eventSource = null;
-        let reconnectAttempts = 0;
-        let maxReconnectAttempts = 5;
-        let soundEnabled = true; // เสียงเปิดเป็นค่า default
-
-        // ฟังก์ชันเปิด/ปิดเสียง
-        function toggleSound() {
-            soundEnabled = !soundEnabled;
+            initializeAudio();
             updateSoundUI();
-            
-            // เปิดใช้งาน audioContext เมื่อเปิดเสียง
-            if (soundEnabled && !audioContext) {
-                enableAudio();
-            }
-            
-            console.log(`🔊 เสียงแจ้งเตือน: ${soundEnabled ? 'เปิด' : 'ปิด'}`);
-        }
+            connectSSE();
 
-        // อัปเดต UI ปุ่มเสียง
-        function updateSoundUI() {
-            const toggle = document.getElementById('soundToggle');
-            const icon = document.getElementById('soundIcon');
-            const text = document.getElementById('soundText');
-            
-            if (soundEnabled) {
-                toggle.classList.remove('sound-off');
-                icon.textContent = '🔊';
-                text.textContent = 'เสียงเปิดอยู่';
-            } else {
-                toggle.classList.add('sound-off');
-                icon.textContent = '🔇';
-                text.textContent = 'เสียงปิดอยู่';
-            }
-        }
-
-        // สร้างเสียงกระดิ่งแบบเรียบง่าย
-        function createBellSound() {
-            if (!audioContext) {
-                try {
-                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                } catch (error) {
-                    console.log('Audio context not supported');
-                    return;
-                }
-            }
-
-            try {
-                // สร้างเสียงกระดิ่ง (โทนเสียงสูง + โทนเสียงต่ำ)
-                const oscillator1 = audioContext.createOscillator();
-                const oscillator2 = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-
-                // ตั้งค่าความถี่เสียง (กระดิ่ง)
-                oscillator1.frequency.setValueAtTime(800, audioContext.currentTime); // โทนสูง
-                oscillator2.frequency.setValueAtTime(600, audioContext.currentTime); // โทนต่ำ
-
-                // ตั้งค่าระดับเสียง
-                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-
-                // เชื่อมต่อเสียง
-                oscillator1.connect(gainNode);
-                oscillator2.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-
-                // เล่นเสียง
-                oscillator1.start(audioContext.currentTime);
-                oscillator2.start(audioContext.currentTime);
-                oscillator1.stop(audioContext.currentTime + 0.5);
-                oscillator2.stop(audioContext.currentTime + 0.5);
-
-                console.log('🔔 เสียงแจ้งเตือนคิวใหม่');
-            } catch (error) {
-                console.log('Error playing bell sound:', error);
-            }
-        }
-
-        // เล่นเสียงแจ้งเตือนซ้ำ 2 ครั้ง
-        function playQueueAlert() {
-            // ตรวจสอบว่าเสียงเปิดอยู่หรือไม่
-            if (!soundEnabled) {
-                console.log('🔇 เสียงถูกปิดอยู่');
-                return;
-            }
-            
-            createBellSound();
-            setTimeout(() => createBellSound(), 300); // เล่นซ้ำหลัง 0.3 วินาที
-        }
-
-        // ตรวจสอบการเปลี่ยนแปลงคิว
-        function checkQueueChanges(newQueueData) {
-            if (isFirstLoad) {
-                isFirstLoad = false;
-                return;
-            }
-
-            let hasNewQueue = false;
-            let changedChannels = [];
-
-            // ตรวจสอบแต่ละช่องบริการ
-            Object.keys(newQueueData.serviceChannels).forEach(channelName => {
-                const newData = newQueueData.serviceChannels[channelName];
-                const oldData = previousQueueData[channelName];
-
-                // ถ้ามีคิวใหม่ (คิวเปลี่ยนจากว่าง หรือ เปลี่ยนเป็นเลขใหม่)
-                if (newData && newData.currentQueue && newData.isActive) {
-                    if (!oldData || 
-                        !oldData.currentQueue || 
-                        oldData.currentQueue !== newData.currentQueue) {
-                        hasNewQueue = true;
-                        // แปลงชื่อช่องจาก "ช่องบริการ X" เป็น "ช่อง X" สำหรับการแสดงผล
-                        const displayChannelName = channelName.replace('ช่องบริการ', 'ช่อง');
-                        changedChannels.push(displayChannelName);
-                        console.log(`🆕 คิวใหม่: ${displayChannelName} เรียกคิว ${newData.currentQueue}`);
-                    }
-                }
-            });
-
-            if (hasNewQueue) {
-                playQueueAlert();
-                showNotification('🔔 มีการเรียกคิวใหม่!');
-                
-                // เพิ่มเอฟเฟกต์ไฮไลท์ให้ช่องที่มีคิวใหม่
-                changedChannels.forEach(channelName => {
-                    highlightChannel(channelName);
-                });
-            }
-        }
-
-        // ไฮไลท์ช่องบริการที่มีคิวใหม่
-        function highlightChannel(channelName) {
-            // แปลงชื่อช่องจาก "ช่อง X" กลับเป็น index (X-1)
-            const channelIndex = parseInt(channelName.replace('ช่อง ', '')) - 1;
-            const rows = document.querySelectorAll('.table-row');
-            if (rows[channelIndex]) {
-                rows[channelIndex].classList.add('new-queue');
-                setTimeout(() => {
-                    rows[channelIndex].classList.remove('new-queue');
-                }, 1000);
-            }
-        }
-
-        // แสดงการแจ้งเตือนข้อความ
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: rgba(46, 204, 113, 0.9);
-                color: white;
-                padding: 15px 25px;
-                border-radius: 10px;
-                font-size: 1.1rem;
-                font-weight: bold;
-                z-index: 1000;
-                animation: slideIn 0.3s ease-out;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            `;
-            notification.textContent = message;
-
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-                @keyframes slideOut {
-                    from { transform: translateX(0); opacity: 1; }
-                    to { transform: translateX(100%); opacity: 0; }
-                }
-            `;
-            document.head.appendChild(style);
-
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease-in';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
-            }, 3000);
-        }
-
-        // เปิดใช้งานเสียงเมื่อผู้ใช้คลิกหน้าจอ
-        function enableAudio() {
-            if (!audioContext) {
-                try {
-                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    console.log('🔊 เปิดใช้งาน AudioContext แล้ว');
-                } catch (error) {
-                    console.log('ไม่สามารถเปิดใช้งานเสียงได้:', error);
-                }
-            }
-        }
-
-        // เปิดใช้งาน AudioContext อัตโนมัติเมื่อโหลดหน้า
-        function initializeAudio() {
-            // ลองเปิดใช้งาน AudioContext ทันที (บางเบราว์เซอร์อนุญาต)
-            try {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                console.log('🔊 เปิดใช้งาน AudioContext อัตโนมัติ');
-            } catch (error) {
-                console.log('AudioContext ต้องการ user interaction');
-            }
-        }
-
-        // อัปเดตสถานะการเชื่อมต่อ
-        function updateConnectionStatus(connected) {
-            const statusElement = document.getElementById('connectionStatus');
-            if (connected) {
-                statusElement.textContent = '🟢 เชื่อมต่อแล้ว';
-                statusElement.className = 'connection-status connected';
-                reconnectAttempts = 0;
-            } else {
-                statusElement.textContent = '🔴 ขาดการเชื่อมต่อ';
-                statusElement.className = 'connection-status disconnected';
-            }
-        }
-
-        // เชื่อมต่อ Server-Sent Events
-        function connectSSE() {
-            if (eventSource) {
-                eventSource.close();
-            }
-
-            console.log('🔌 กำลังเชื่อมต่อ SSE...');
-            updateConnectionStatus(false);
-
-            eventSource = new EventSource('/api/queue-stream');
-
-            eventSource.onopen = function() {
-                console.log('✅ เชื่อมต่อ SSE สำเร็จ');
-                updateConnectionStatus(true);
-            };
-
-            eventSource.onmessage = function(event) {
-                try {
-                    const data = JSON.parse(event.data);
-                    
-                    // ข้าม ping messages
-                    if (data.type === 'ping') {
-                        return;
-                    }
-
-                    console.log('📡 ได้รับข้อมูลอัปเดต:', data);
-                    
-                    // ตรวจสอบการเปลี่ยนแปลงและเล่นเสียงแจ้งเตือน
-                    checkQueueChanges(data);
-
-                    // เก็บข้อมูลปัจจุบันไว้เปรียบเทียบครั้งถัดไป
-                    previousQueueData = JSON.parse(JSON.stringify(data.serviceChannels));
-
-                    // อัปเดต UI
-                    updateQueueDisplay(data);
-                } catch (error) {
-                    console.error('Error parsing SSE data:', error);
-                }
-            };
-
-            eventSource.onerror = function(event) {
-                console.log('❌ SSE connection error:', event);
-                updateConnectionStatus(false);
-                
-                eventSource.close();
-                
-                // ลองเชื่อมต่อใหม่
-                if (reconnectAttempts < maxReconnectAttempts) {
-                    reconnectAttempts++;
-                    console.log(`🔄 กำลังลองเชื่อมต่อใหม่... ครั้งที่ ${reconnectAttempts}`);
-                    setTimeout(connectSSE, 3000 * reconnectAttempts); // เพิ่มเวลารอทุกครั้ง
-                } else {
-                    console.log('💥 ไม่สามารถเชื่อมต่อได้ กำลังใช้ fallback polling...');
-                    useFallbackPolling();
-                }
-            };
-        }
-
-        // ใช้ polling เป็น fallback เมื่อ SSE ไม่ทำงาน
-        function useFallbackPolling() {
-            updateConnectionStatus(false);
-            
-            const pollInterval = setInterval(async () => {
-                try {
-                    const response = await fetch('/api/queue-status');
-                    if (response.ok) {
-                        const data = await response.json();
-                        
-                        checkQueueChanges(data);
-                        previousQueueData = JSON.parse(JSON.stringify(data.serviceChannels));
-                        updateQueueDisplay(data);
-                        
-                        // ถ้า polling ทำงานได้ ลองเชื่อมต่อ SSE ใหม่
-                        clearInterval(pollInterval);
-                        reconnectAttempts = 0;
-                        setTimeout(connectSSE, 1000);
-                    }
-                } catch (error) {
-                    console.error('Polling error:', error);
-                }
-            }, 5000); // polling ทุก 5 วินาที
-        }
-
-        // อัปเดต UI ด้วยข้อมูลใหม่
-        function updateQueueDisplay(data) {
-            // อัปเดตสถิติ
-            document.getElementById('activeChannels').textContent = 
-                Object.values(data.serviceChannels).filter(ch => ch.isActive).length;
-
-            // อัปเดตตาราง
-            const tableBody = document.getElementById('queueTableBody');
-            tableBody.innerHTML = '';
-
-            for (let i = 1; i <= 6; i++) {
-                const channelName = `ช่อง ${i}`;
-                const channelData = data.serviceChannels[`ช่องบริการ ${i}`];
-                
-                const row = createTableRow(channelName, channelData);
-                tableBody.appendChild(row);
-            }
-        }
-
-        function updateDateTime() {
-            const now = new Date();
-            const options = {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                timeZone: 'Asia/Bangkok'
-            };
-            document.getElementById('datetime').textContent = now.toLocaleDateString('th-TH', options);
-        }
-
-        function createTableRow(channelName, channelData) {
-            const row = document.createElement('div');
-            const isActive = channelData && channelData.isActive && channelData.currentQueue;
-            
-            row.className = `table-row ${isActive ? 'active' : 'inactive'}`;
-            
-            const queueDisplay = channelData && channelData.currentQueue ? channelData.currentQueue : 'ว่าง';
-
-            row.innerHTML = `
-                <div class="channel-name">${channelName}</div>
-                <div class="queue-number ${!isActive ? 'empty' : ''}">${queueDisplay}</div>
-            `;
-
-            return row;
-        }
-
-        // เริ่มต้นระบบ
-        function initialize() {
-            updateDateTime();
-            initializeAudio(); // เริ่มต้นเสียงอัตโนมัติ
-            updateSoundUI(); // อัปเดต UI ปุ่มเสียง
-            connectSSE(); // เชื่อมต่อ SSE แทน polling
-
-            // อัปเดตเวลาทุกวินาที
             setInterval(updateDateTime, 1000);
         }
 
@@ -1493,21 +681,18 @@
         document.addEventListener('touchstart', enableAudio, { once: true });
         document.addEventListener('DOMContentLoaded', initialize);
 
-        // รีเชื่อมต่อเมื่อกลับมาที่หน้าเว็บ
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden && (!eventSource || eventSource.readyState === EventSource.CLOSED)) {
                 connectSSE();
             }
         });
 
-        // รีเชื่อมต่อเมื่อมีการเชื่อมต่อเน็ตใหม่
         window.addEventListener('online', () => {
             if (!eventSource || eventSource.readyState === EventSource.CLOSED) {
                 connectSSE();
             }
         });
 
-        // ปิดการเชื่อมต่อเมื่อปิดหน้าเว็บ
         window.addEventListener('beforeunload', () => {
             if (eventSource) {
                 eventSource.close();
