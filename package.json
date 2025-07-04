@@ -1,0 +1,26 @@
+{
+  "name": "queue-system-railway",
+  "version": "1.0.0",
+  "description": "ระบบรันคิวบน Railway - พร้อม SQLite Database",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "keywords": [
+    "queue",
+    "system",
+    "railway",
+    "sqlite",
+    "nodejs"
+  ],
+  "author": "Queue System Team",
+  "license": "MIT"
+}

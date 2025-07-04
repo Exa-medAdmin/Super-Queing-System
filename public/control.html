@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน้าควบคุม - ระบบรันคิว</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        /* ธีมสีต่างๆ */
+        body.theme-default {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        }
+
+        body.theme-blue {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        }
+
+        body.theme-green {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+        }
+
+        body.theme-purple {
+            background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
+        }
+
+        body.theme-orange {
+            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+        }
+
+        body.theme-red {
+            background: linear-gradient(135deg, #e17055 0%, #d63031 100%);
+        }
+
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            gap: 20px;
+        }
+
+        /* Layout Desktop */
+        @media (min-width: 769px) {
+            .main-container {
+                grid-template-columns: 250px 1fr;
+                grid-template-areas: 
+                    "description header"
+                    "description content"
+                    "description footer";
+            }
+
+            .description-panel {
+                grid-area: description;
+            }
+
+            .control-container {
+                grid-area: header / content / footer;
+            }
+        }
+
+        /* Layout Mobile */
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                grid-template-areas: 
+                    "header"
+                    "description"
+                    "content"
+                    "footer";
+            }
+
+            .description-panel {
+                grid-area: description;
+            }
+
+            .control-container {
+                grid-area: header / content / footer;
+            }
+        }
+
+        .description-panel {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            height: fit-content;
+            color: white;
+        }
+
+        .description-panel h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .description-panel .content {
+            font-size: 1rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            opacity: 0.9;
+        }
+
+        .description-panel.empty {
+            display: none;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .status-display {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .current-queue {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .queue-info {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 18px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .links {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .links a {
+            display: inline-block;
+            margin: 5px 10px;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .links a:hover {
+            background: #764ba2;
+        }
+
+        /* Loading Animation */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid #fff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                gap: 15px;
+            }
+
+            .description-panel {
+                padding: 15px;
+                margin-bottom: 0;
+            }
+
+            .description-panel h3 {
+                font-size: 1.2rem;
+            }
+
+            .description-panel .content {
+                font-size: 0.9rem;
+            }
+
+            .container {
+                border-radius: 15px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .current-queue {
+                font-size: 2.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .current-queue {
+                font-size: 2rem;
+            }
+
+            .links a {
+                display: block;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body class="theme-default">
+    <div class="main-container">
+        <div class="description-panel" id="descriptionPanel">
+            <h3>📋 รายละเอียด</h3>
+            <div class="content" id="descriptionContent">กำลังโหลด...</div>
+        </div>
+
+        <div class="control-container">
+            <div class="container">
+                <div class="header">
+                    <h1>🎛️ ระบบควบคุมคิว</h1>
+                    <p>เรียกคิวถัดไป และจัดการการให้บริการ</p>
+                </div>
+
+                <div class="content">
+                    <div class="form-group">
+                        <label for="serviceChannelSelect">เลือกช่องบริการ:</label>
+                        <select id="serviceChannelSelect" onchange="updateCurrentQueue()">
+                            <!-- ตัวเลือกจะถูกสร้างแบบไดนามิกตามจำนวนช่องที่ตั้งค่า -->
+                        </select>
+                    </div>
+
+                    <div class="status-display">
+                        <div class="queue-info">กำลังให้บริการคิว:</div>
+                        <div class="current-queue" id="currentQueue">กำลังโหลด...</div>
+                        <div class="queue-info" id="channelStatus">เลือกช่องบริการ</div>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-primary" id="callNextBtn" onclick="callNextQueue()">
+                            📢 เรียกคิวถัดไป
+                        </button>
+                    </div>
+
+                    <div id="message" class="message" style="display: none;"></div>
+                </div>
+
+                <div class="links">
+                    <a href="/display" target="_blank">📺 หน้าจอแสดงผล</a>
+                    <a href="/">⚙️ หน้าจัดการระบบ</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isLoading = false;
+        let currentSettings = null; // เก็บการตั้งค่าปัจจุบัน
+
+        // อัปเดตธีมสี
+        function updateTheme(theme) {
+            // ลบ class ธีมเก่าทั้งหมด
+            document.body.classList.remove('theme-default', 'theme-blue', 'theme-green', 'theme-purple', 'theme-orange', 'theme-red');
+            // เพิ่ม class ธีมใหม่
+            document.body.classList.add(`theme-${theme}`);
+        }
+
+        // อัปเดตข้อความอธิบาย
+        function updateDescription(descriptionText) {
+            const panel = document.getElementById('descriptionPanel');
+            const content = document.getElementById('descriptionContent');
+            
+            if (descriptionText && descriptionText.trim()) {
+                content.textContent = descriptionText.trim();
+                panel.classList.remove('empty');
+            } else {
+                panel.classList.add('empty');
+            }
+        }
+
+        // สร้างตัวเลือกช่องบริการ
+        function generateChannelOptions(channelCount) {
+            const select = document.getElementById('serviceChannelSelect');
+            const currentValue = select.value; // เก็บค่าที่เลือกอยู่
+            
+            select.innerHTML = '';
+            
+            for (let i = 1; i <= channelCount; i++) {
+                const option = document.createElement('option');
+                option.value = `ช่องบริการ ${i}`;
+                option.textContent = `ช่องบริการ ${i}`;
+                select.appendChild(option);
+            }
+            
+            // คืนค่าที่เลือกอยู่ก่อนหน้า (ถ้ายังมีอยู่)
+            if (currentValue && Array.from(select.options).some(opt => opt.value === currentValue)) {
+                select.value = currentValue;
+            }
+        }
+
+        // โหลดการตั้งค่าระบบและอัปเดต UI
+        async function loadSystemSettings() {
+            try {
+                const response = await fetch('/api/system-settings');
+                if (response.ok) {
+                    const settings = await response.json();
+                    
+                    if (!currentSettings || JSON.stringify(currentSettings) !== JSON.stringify(settings)) {
+                        currentSettings = settings;
+                        
+                        // อัปเดตธีม
+                        updateTheme(settings.background_theme);
+                        
+                        // อัปเดตข้อความอธิบาย
+                        updateDescription(settings.description_text);
+                        
+                        // อัปเดตตัวเลือกช่องบริการ
+                        generateChannelOptions(settings.channel_count);
+                        
+                        console.log('✅ อัปเดตการตั้งค่าระบบ:', settings);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading system settings:', error);
+            }
+        }
+
+        // อัปเดตข้อมูลคิวปัจจุบัน
+        async function updateCurrentQueue() {
+            const selectedChannel = document.getElementById('serviceChannelSelect').value;
+            const currentQueueElement = document.getElementById('currentQueue');
+            const channelStatusElement = document.getElementById('channelStatus');
+            
+            if (!selectedChannel) {
+                currentQueueElement.textContent = 'เลือกช่องบริการ';
+                channelStatusElement.textContent = 'กรุณาเลือกช่องบริการ';
+                return;
+            }
+            
+            try {
+                // แสดงสถานะกำลังโหลดแบบสั้นๆ
+                currentQueueElement.textContent = 'กำลังโหลด...';
+                channelStatusElement.textContent = 'กำลังตรวจสอบ...';
+
+                const response = await fetch(`/api/queue-status/${encodeURIComponent(selectedChannel)}`);
+                
+                if (!response.ok) {
+                    throw new Error('ไม่สามารถโหลดข้อมูลได้');
+                }
+
+                const data = await response.json();
+                
+                currentQueueElement.textContent = data.currentQueue;
+                channelStatusElement.textContent = data.isActive ? 
+                    `${selectedChannel} - กำลังให้บริการ` : 
+                    `${selectedChannel} - รอลูกค้า`;
+
+            } catch (error) {
+                console.error('Error updating current queue:', error);
+                currentQueueElement.textContent = 'เกิดข้อผิดพลาด';
+                channelStatusElement.textContent = 'ไม่สามารถเชื่อมต่อได้';
+                showMessage('ไม่สามารถโหลดข้อมูลคิวได้', 'error');
+            }
+        }
+
+        // เรียกคิวถัดไป
+        async function callNextQueue() {
+            if (isLoading) return;
+
+            const selectedChannel = document.getElementById('serviceChannelSelect').value;
+            
+            if (!selectedChannel) {
+                showMessage('กรุณาเลือกช่องบริการก่อน', 'error');
+                return;
+            }
+            
+            const button = document.getElementById('callNextBtn');
+            
+            isLoading = true;
+            button.disabled = true;
+            button.classList.add('loading');
+            
+            showMessage('กำลังเรียกคิวถัดไป...', 'info');
+
+            try {
+                const response = await fetch('/api/call-next-queue', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ serviceChannel: selectedChannel }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(`✅ เรียกคิว ${data.queueNumber} สำหรับ${selectedChannel} เรียบร้อยแล้ว!`, 'success');
+                    updateCurrentQueue(); // อัปเดตข้อมูลใหม่หลังเรียกคิวสำเร็จ
+                } else {
+                    showMessage(`⚠️ ${data.message || 'ไม่มีคิวรออยู่ขณะนี้'}`, 'error');
+                    updateCurrentQueue(); // อัปเดตข้อมูลเผื่อมีการเปลี่ยนแปลง
+                }
+
+            } catch (error) {
+                console.error('Error calling next queue:', error);
+                showMessage('❌ เกิดข้อผิดพลาดในการเรียกคิว กรุณาลองใหม่', 'error');
+            } finally {
+                isLoading = false;
+                button.disabled = false;
+                button.classList.remove('loading');
+            }
+        }
+
+        // แสดงข้อความแจ้งเตือน
+        function showMessage(text, type = 'info') {
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = text;
+            messageElement.className = `message ${type}`;
+            messageElement.style.display = 'block';
+
+            // ซ่อนข้อความหลัง 5 วินาที
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 5000);
+        }
+
+        // ตัวแปรสำหรับ SSE (เพื่อรับการอัปเดตการตั้งค่า)
+        let eventSource = null;
+
+        // เชื่อมต่อ SSE เพื่อรับการอัปเดตการตั้งค่า
+        function connectSSE() {
+            if (eventSource) {
+                eventSource.close();
+            }
+
+            console.log('🔌 เชื่อมต่อ SSE สำหรับหน้าควบคุม...');
+
+            eventSource = new EventSource('/api/queue-stream');
+
+            eventSource.onopen = function() {
+                console.log('✅ เชื่อมต่อ SSE สำเร็จ (Control)');
+            };
+
+            eventSource.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    
+                    // ข้าม ping messages
+                    if (data.type === 'ping') {
+                        return;
+                    }
+
+                    // อัปเดตการตั้งค่าถ้ามีการเปลี่ยนแปลง
+                    if (data.settings) {
+                        if (!currentSettings || JSON.stringify(currentSettings) !== JSON.stringify(data.settings)) {
+                            currentSettings = data.settings;
+                            
+                            // อัปเดตธีม
+                            updateTheme(currentSettings.background_theme);
+                            
+                            // อัปเดตข้อความอธิบาย
+                            updateDescription(currentSettings.description_text);
+                            
+                            // อัปเดตตัวเลือกช่องบริการ
+                            generateChannelOptions(currentSettings.channel_count);
+                            
+                            console.log('📡 อัปเดตการตั้งค่าจาก SSE:', currentSettings);
+                        }
+                    }
+
+                } catch (error) {
+                    console.error('Error parsing SSE data:', error);
+                }
+            };
+
+            eventSource.onerror = function(event) {
+                console.log('❌ SSE connection error (Control):', event);
+                eventSource.close();
+                
+                // ลองเชื่อมต่อใหม่หลัง 5 วินาที
+                setTimeout(connectSSE, 5000);
+            };
+        }
+
+        // เริ่มต้นระบบ
+        async function initialize() {
+            await loadSystemSettings(); // โหลดการตั้งค่าก่อน
+            updateCurrentQueue(); // โหลดข้อมูลคิวครั้งแรก
+            connectSSE(); // เชื่อมต่อ SSE สำหรับการอัปเดตการตั้งค่า
+        }
+
+        // รับฟังการกด Enter ในฟอร์ม
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !isLoading) {
+                callNextQueue();
+            }
+        });
+
+        // เริ่มต้นเมื่อหน้าเว็บโหลดเสร็จ
+        document.addEventListener('DOMContentLoaded', initialize);
+
+        // อัปเดตเฉพาะเมื่อกลับมาที่หน้าเว็บ
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                updateCurrentQueue(); // อัปเดตข้อมูลคิวครั้งเดียวเมื่อกลับมา
+                loadSystemSettings(); // ตรวจสอบการตั้งค่าใหม่
+            }
+        });
+
+        // รีเชื่อมต่อ SSE เมื่อมีการเชื่อมต่อเน็ตใหม่
+        window.addEventListener('online', () => {
+            if (!eventSource || eventSource.readyState === EventSource.CLOSED) {
+                connectSSE();
+            }
+        });
+
+        // ปิดการเชื่อมต่อเมื่อปิดหน้าเว็บ
+        window.addEventListener('beforeunload', () => {
+            if (eventSource) {
+                eventSource.close();
+            }
+        });
+    </script>
+</body>
+</html>
