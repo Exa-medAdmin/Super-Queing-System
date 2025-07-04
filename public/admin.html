@@ -13,10 +13,35 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #e17055 0%, #fdcb6e 100%);
             min-height: 100vh;
             padding: 20px;
             color: #333;
+            transition: background 0.3s ease;
+        }
+
+        /* ธีมสีต่างๆ สำหรับหน้า Admin */
+        body.theme-default {
+            background: linear-gradient(135deg, #e17055 0%, #fdcb6e 100%);
+        }
+
+        body.theme-blue {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        }
+
+        body.theme-green {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+        }
+
+        body.theme-purple {
+            background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
+        }
+
+        body.theme-orange {
+            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+        }
+
+        body.theme-red {
+            background: linear-gradient(135deg, #e17055 0%, #d63031 100%);
         }
 
         .container {
@@ -410,7 +435,7 @@
                             <div class="color-option blue" data-theme="blue">น้ำเงิน</div>
                             <div class="color-option green" data-theme="green">เขียว</div>
                             <div class="color-option purple" data-theme="purple">ม่วง</div>
-                            <div class="color-option orange" data-theme="orange">ส้ม</div>
+                            <div class="color-option orange" data-theme="orange">ชมพู</div>
                             <div class="color-option red" data-theme="red">แดง</div>
                         </div>
                     </div>
@@ -495,6 +520,15 @@
             background_theme: 'default'
         };
 
+        // อัปเดตธีมสีของหน้า Admin
+        function updateAdminTheme(theme) {
+            // ลบ class ธีมเก่าทั้งหมด
+            document.body.classList.remove('theme-default', 'theme-blue', 'theme-green', 'theme-purple', 'theme-orange', 'theme-red');
+            // เพิ่ม class ธีมใหม่
+            document.body.classList.add(`theme-${theme}`);
+            console.log(`🎨 อัปเดตธีม Admin เป็น: ${theme}`);
+        }
+
         // โหลดการตั้งค่าระบบ
         async function loadSystemSettings() {
             try {
@@ -516,6 +550,9 @@
                         option.classList.add('selected');
                     }
                 });
+                
+                // อัปเดตธีมสีของหน้า Admin
+                updateAdminTheme(settings.background_theme);
                 
                 // สร้างช่องกู้คืนตามจำนวนช่องบริการ
                 generateRestoreChannels(settings.channel_count);
@@ -591,6 +628,9 @@
                     document.getElementById('currentChannelCount').textContent = channelCount;
                     generateRestoreChannels(channelCount);
                     
+                    // อัปเดตธีมสีของหน้า Admin ทันที
+                    updateAdminTheme(backgroundTheme);
+                    
                     // ข้อมูลจะอัปเดตอัตโนมัติผ่าน SSE
                 } else {
                     showSettingsMessage('❌ ' + (data.error || 'เกิดข้อผิดพลาด'), 'error');
@@ -609,6 +649,10 @@
                     option.classList.remove('selected');
                 });
                 e.target.classList.add('selected');
+                
+                // อัปเดตธีมสีของหน้า Admin ทันทีเมื่อคลิก (ก่อนบันทึก)
+                const selectedTheme = e.target.dataset.theme;
+                updateAdminTheme(selectedTheme);
             }
         });
 
@@ -686,6 +730,9 @@
                                 }
                             });
                             
+                            // อัปเดตธีมสีของหน้า Admin
+                            updateAdminTheme(data.settings.background_theme);
+                            
                             // สร้างช่องกู้คืนใหม่
                             generateRestoreChannels(data.settings.channel_count);
                         }
@@ -745,38 +792,52 @@
                 return;
             }
 
-            if (!confirm('⚠️ คุณแน่ใจหรือไม่ที่จะรีเซ็ตระบบทั้งหมด?\n\nการกระทำนี้จะ:\n- ลบคิวทั้งหมด\n- สร้างคิวใหม่ 1-1500\n- รีเซ็ตช่องบริการทั้งหมด\n- ล้างข้อมูลทุกช่องกรอก\n- ไม่สามารถย้อนกลับได้!')) {
+            if (!confirm('⚠️ คุณแน่ใจหรือไม่ที่จะรีเซ็ตระบบทั้งหมด?\n\nการกระทำนี้จะ:\n- ลบคิวทั้งหมด\n- สร้างคิวใหม่ 1-1500\n- รีเซ็ตช่องบริการทั้งหมด\n- รีเซ็ตการตั้งค่าเป็นค่าเริ่มต้น\n- ล้างข้อมูลทุกช่องกรอก\n- ไม่สามารถย้อนกลับได้!')) {
                 return;
             }
 
             try {
-                showMessage('กำลังรีเซ็ตระบบ...', 'info');
+                showMessage('กำลังรีเซ็ตระบบทั้งหมด...', 'info');
 
-                const response = await fetch('/api/reset-all-queues', {
+                // ขั้นตอนที่ 1: รีเซ็ตคิว
+                const queueResponse = await fetch('/api/reset-all-queues', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ confirmationCode })
                 });
 
-                const data = await response.json();
+                const queueData = await queueResponse.json();
 
-                if (data.success) {
-                    showMessage('✅ รีเซ็ตระบบเรียบร้อยแล้ว!', 'success');
-                    
-                    // ล้างช่องรหัสยืนยัน
-                    document.getElementById('resetCode').value = '';
-                    
-                    // ล้างข้อมูลช่องกรอกทั้งหมดในส่วนกู้คืนสถานะ
-                    clearAllRestoreFields();
-                    
-                    // ข้อมูลจะอัปเดตอัตโนมัติผ่าน SSE
-
-                } else {
-                    showMessage('❌ ' + (data.error || 'เกิดข้อผิดพลาด'), 'error');
+                if (!queueData.success) {
+                    showMessage('❌ ' + (queueData.error || 'เกิดข้อผิดพลาดในการรีเซ็ตคิว'), 'error');
+                    return;
                 }
 
+                // ขั้นตอนที่ 2: รีเซ็ตการตั้งค่าเป็นค่าเริ่มต้น
+                const settingsResponse = await fetch('/api/system-settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        channelCount: 6,        // ค่าเริ่มต้น
+                        descriptionText: '',    // ค่าเริ่มต้น (ว่าง)
+                        backgroundTheme: 'default'  // ค่าเริ่มต้น
+                    })
+                });
+
+                const settingsData = await settingsResponse.json();
+
+                if (!settingsData.success) {
+                    showMessage('❌ เกิดข้อผิดพลาดในการรีเซ็ตการตั้งค่า', 'error');
+                    return;
+                }
+
+                // ขั้นตอนที่ 3: รีเซ็ต UI ทั้งหมด
+                resetAllUIToDefault();
+
+                showMessage('✅ รีเซ็ตระบบทั้งหมดเรียบร้อยแล้ว! ทุกอย่างกลับเป็นค่าเริ่มต้น', 'success');
+
             } catch (error) {
-                console.error('Error resetting queues:', error);
+                console.error('Error resetting system:', error);
                 showMessage('❌ เกิดข้อผิดพลาดในการรีเซ็ตระบบ', 'error');
             }
         }
@@ -874,6 +935,43 @@
             }
         }
 
+        // รีเซ็ต UI ทั้งหมดเป็นค่าเริ่มต้น
+        function resetAllUIToDefault() {
+            // รีเซ็ตการตั้งค่าระบบ
+            document.getElementById('channelCount').value = 6;
+            document.getElementById('currentChannelCount').textContent = 6;
+            document.getElementById('descriptionText').value = '';
+            
+            // รีเซ็ตธีมสีเป็น default
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.classList.remove('selected');
+                if (option.dataset.theme === 'default') {
+                    option.classList.add('selected');
+                }
+            });
+            
+            // อัปเดตธีมสีของหน้า Admin เป็น default
+            updateAdminTheme('default');
+            
+            // ล้างช่องรหัสยืนยัน
+            document.getElementById('resetCode').value = '';
+            
+            // ล้างช่องกู้คืนสถานะทั้งหมด
+            clearAllRestoreFields();
+            
+            // อัปเดต currentSettings
+            currentSettings = {
+                channel_count: 6,
+                description_text: '',
+                background_theme: 'default'
+            };
+            
+            // สร้างช่องกู้คืนใหม่ตามจำนวน default (6 ช่อง)
+            generateRestoreChannels(6);
+            
+            console.log('🔄 รีเซ็ต UI ทั้งหมดเป็นค่าเริ่มต้นแล้ว');
+        }
+
         // เคลียร์ข้อมูลช่องกู้คืนทั้งหมด
         function clearAllRestoreFields() {
             for (let i = 1; i <= 20; i++) { // ล้างสูงสุด 20 ช่อง
@@ -918,7 +1016,7 @@
 
         // เริ่มต้นระบบ
         function initialize() {
-            loadSystemSettings(); // โหลดการตั้งค่าก่อน
+            loadSystemSettings(); // โหลดการตั้งค่าก่อน (จะโหลดธีมด้วย)
             loadStatistics(); // โหลดข้อมูลครั้งแรก
             connectSSE(); // เชื่อมต่อ SSE สำหรับ real-time updates
         }
