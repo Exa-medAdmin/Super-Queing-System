@@ -50,70 +50,27 @@
             gap: 20px;
         }
 
-        /* Layout Desktop */
-        @media (min-width: 769px) {
-            .main-container {
-                grid-template-columns: 250px 1fr;
-                grid-template-areas: 
-                    "description header"
-                    "description content"
-                    "description footer";
-            }
-
-            .description-panel {
-                grid-area: description;
-            }
-
-            .control-container {
-                grid-area: header / content / footer;
-            }
-        }
-
-        /* Layout Mobile */
-        @media (max-width: 768px) {
-            .main-container {
-                grid-template-columns: 1fr;
-                grid-template-areas: 
-                    "header"
-                    "description"
-                    "content"
-                    "footer";
-            }
-
-            .description-panel {
-                grid-area: description;
-            }
-
-            .control-container {
-                grid-area: header / content / footer;
-            }
-        }
-
-        .description-panel {
+        .description-banner {
             background: rgba(255,255,255,0.15);
             backdrop-filter: blur(20px);
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            height: fit-content;
+            margin-bottom: 20px;
+            text-align: center;
             color: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
-        .description-panel h3 {
-            font-size: 1.3rem;
-            margin-bottom: 10px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-        }
-
-        .description-panel .content {
-            font-size: 1rem;
-            line-height: 1.5;
+        .description-banner h2 {
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin: 0;
             white-space: pre-wrap;
-            opacity: 0.9;
         }
 
-        .description-panel.empty {
+        .description-banner.empty {
             display: none;
         }
 
@@ -308,17 +265,13 @@
                 gap: 15px;
             }
 
-            .description-panel {
+            .description-banner {
                 padding: 15px;
-                margin-bottom: 0;
+                margin-bottom: 15px;
             }
 
-            .description-panel h3 {
-                font-size: 1.2rem;
-            }
-
-            .description-panel .content {
-                font-size: 0.9rem;
+            .description-banner h2 {
+                font-size: 1.5rem;
             }
 
             .container {
@@ -372,13 +325,11 @@
 </head>
 <body class="theme-default">
     <div class="main-container">
-        <div class="description-panel" id="descriptionPanel">
-            <h3>📋 รายละเอียด</h3>
-            <div class="content" id="descriptionContent">กำลังโหลด...</div>
+        <div class="description-banner" id="descriptionBanner">
+            <h2 id="descriptionText">กำลังโหลด...</h2>
         </div>
 
-        <div class="control-container">
-            <div class="container">
+        <div class="container">
                 <div class="header">
                     <h1>🎛️ ระบบควบคุมคิว</h1>
                     <p>เรียกคิวถัดไป และจัดการการให้บริการ</p>
@@ -413,7 +364,6 @@
                 </div>
             </div>
         </div>
-    </div>
 
     <script>
         let isLoading = false;
@@ -429,14 +379,14 @@
 
         // อัปเดตข้อความอธิบาย
         function updateDescription(descriptionText) {
-            const panel = document.getElementById('descriptionPanel');
-            const content = document.getElementById('descriptionContent');
+            const banner = document.getElementById('descriptionBanner');
+            const textElement = document.getElementById('descriptionText');
             
             if (descriptionText && descriptionText.trim()) {
-                content.textContent = descriptionText.trim();
-                panel.classList.remove('empty');
+                textElement.textContent = descriptionText.trim();
+                banner.classList.remove('empty');
             } else {
-                panel.classList.add('empty');
+                banner.classList.add('empty');
             }
         }
 
