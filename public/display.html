@@ -50,70 +50,9 @@
             gap: 30px;
         }
 
-        /* Layout Desktop */
-        @media (min-width: 769px) {
-            .main-container {
-                grid-template-columns: 300px 1fr;
-                grid-template-areas: 
-                    "description header"
-                    "description table"
-                    "description footer";
-            }
-
-            .description-panel {
-                grid-area: description;
-            }
-
-            .queue-container {
-                grid-area: header / table / footer;
-            }
-        }
-
-        /* Layout Mobile */
-        @media (max-width: 768px) {
-            .main-container {
-                grid-template-columns: 1fr;
-                grid-template-areas: 
-                    "header"
-                    "description"
-                    "table"
-                    "footer";
-            }
-
-            .description-panel {
-                grid-area: description;
-            }
-
-            .queue-container {
-                grid-area: header / table / footer;
-            }
-        }
-
-        .description-panel {
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,255,0.2);
-            height: fit-content;
-        }
-
-        .description-panel h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .description-panel .content {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            opacity: 0.9;
-        }
-
-        .description-panel.empty {
-            display: none;
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         .header {
@@ -438,7 +377,6 @@
                 </div>
             </div>
         </div>
-    </div>
 
     <script>
         let previousQueueData = {}; // เก็บข้อมูลคิวครั้งก่อน
@@ -488,16 +426,14 @@
             document.body.classList.add(`theme-${theme}`);
         }
 
-        // อัปเดตข้อความอธิบาย
+        // อัปเดตข้อความอธิบายที่หัวข้อหลัก
         function updateDescription(descriptionText) {
-            const panel = document.getElementById('descriptionPanel');
-            const content = document.getElementById('descriptionContent');
+            const titleElement = document.getElementById('mainTitle');
             
             if (descriptionText && descriptionText.trim()) {
-                content.textContent = descriptionText.trim();
-                panel.classList.remove('empty');
+                titleElement.textContent = descriptionText.trim();
             } else {
-                panel.classList.add('empty');
+                titleElement.textContent = '🏥 ระบบคิว';
             }
         }
 
