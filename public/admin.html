@@ -421,6 +421,7 @@
                     <small style="color: #666;">ข้อความนี้จะแสดงด้านซ้ายของตารางคิว (Desktop) หรือด้านบน (Mobile)</small>
                 </div>
                 <button class="btn btn-primary" onclick="saveSystemSettings()">💾 บันทึกการตั้งค่า</button>
+                <div id="settingsMessage" class="message" style="display: none; margin-top: 15px;"></div>
             </div>
 
             <!-- สถิติระบบ -->
@@ -437,7 +438,7 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="completedCount">-</div>
-                        <div class="stat-label">เสร็จสิ้นแล้ว</div>
+                        <div class="stat-label">ให้บริการแล้ว</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="activeChannels">-</div>
@@ -549,6 +550,19 @@
             }
         }
 
+        // แสดงข้อความแจ้งเตือนสำหรับการตั้งค่า
+        function showSettingsMessage(text, type = 'info') {
+            const messageElement = document.getElementById('settingsMessage');
+            messageElement.innerHTML = text.replace(/\n/g, '<br>');
+            messageElement.className = `message ${type}`;
+            messageElement.style.display = 'block';
+
+            // ซ่อนข้อความหลัง 5 วินาที
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 5000);
+        }
+
         // บันทึกการตั้งค่าระบบ
         async function saveSystemSettings() {
             const channelCount = parseInt(document.getElementById('channelCount').value);
@@ -558,12 +572,12 @@
             
             // ตรวจสอบข้อมูล
             if (!channelCount || channelCount < 1 || channelCount > 20) {
-                showMessage('จำนวนช่องบริการต้องอยู่ระหว่าง 1-20', 'error');
+                showSettingsMessage('จำนวนช่องบริการต้องอยู่ระหว่าง 1-20', 'error');
                 return;
             }
 
             try {
-                showMessage('กำลังบันทึกการตั้งค่า...', 'info');
+                showSettingsMessage('กำลังบันทึกการตั้งค่า...', 'info');
 
                 const response = await fetch('/api/system-settings', {
                     method: 'POST',
@@ -579,7 +593,7 @@
 
                 if (data.success) {
                     currentSettings = data.settings;
-                    showMessage('✅ บันทึกการตั้งค่าเรียบร้อยแล้ว!', 'success');
+                    showSettingsMessage('✅ บันทึกการตั้งค่าเรียบร้อยแล้ว! หน้าจอแสดงผลและควบคุมจะอัปเดตทันที', 'success');
                     
                     // อัปเดตการแสดงผล
                     document.getElementById('currentChannelCount').textContent = channelCount;
@@ -587,12 +601,12 @@
                     
                     // ข้อมูลจะอัปเดตอัตโนมัติผ่าน SSE
                 } else {
-                    showMessage('❌ ' + (data.error || 'เกิดข้อผิดพลาด'), 'error');
+                    showSettingsMessage('❌ ' + (data.error || 'เกิดข้อผิดพลาด'), 'error');
                 }
 
             } catch (error) {
                 console.error('Error saving system settings:', error);
-                showMessage('❌ เกิดข้อผิดพลาดในการบันทึกการตั้งค่า', 'error');
+                showSettingsMessage('❌ เกิดข้อผิดพลาดในการบันทึกการตั้งค่า', 'error');
             }
         }
 
