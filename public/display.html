@@ -50,25 +50,27 @@
             gap: 30px;
         }
 
-        .main-container {
-            max-width: 800px;
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
         }
 
-        .header {
+        .main-title {
             text-align: center;
-            margin-bottom: 40px;
+            font-size: 3.5rem;
+            margin-bottom: 30px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            font-weight: bold;
         }
 
-        .header h1 {
-            font-size: 3.5rem;
-            margin-bottom: 15px;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+        .datetime-info {
+            text-align: center;
+            margin-bottom: 30px;
+            opacity: 0.9;
         }
 
         .datetime {
             font-size: 1.3rem;
-            opacity: 0.9;
             margin-bottom: 10px;
         }
 
@@ -78,7 +80,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 15px;
         }
 
         .connection-status {
@@ -245,24 +246,7 @@
                 padding: 15px;
             }
 
-            .main-container {
-                gap: 20px;
-            }
-
-            .description-panel {
-                padding: 20px;
-                margin-bottom: 0;
-            }
-
-            .description-panel h3 {
-                font-size: 1.3rem;
-            }
-
-            .description-panel .content {
-                font-size: 1rem;
-            }
-
-            .header h1 {
+            .main-title {
                 font-size: 2.5rem;
             }
 
@@ -272,7 +256,7 @@
 
             .status-info {
                 flex-direction: column;
-                gap: 10px;
+                gap: 0px;
             }
 
             .table-header,
@@ -299,7 +283,7 @@
         }
 
         @media (max-width: 480px) {
-            .header h1 {
+            .main-title {
                 font-size: 2rem;
             }
 
@@ -719,15 +703,8 @@
                     
                     // อัปเดตข้อความอธิบาย
                     updateDescription(currentSettings.description_text);
-                    
-                    // อัปเดตจำนวนช่องทั้งหมด
-                    document.getElementById('totalChannels').textContent = currentSettings.channel_count;
                 }
             }
-
-            // อัปเดตสถิติ
-            document.getElementById('activeChannels').textContent = 
-                Object.values(data.serviceChannels).filter(ch => ch.isActive).length;
 
             // อัปเดตตาราง
             const tableBody = document.getElementById('queueTableBody');
